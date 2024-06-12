@@ -9,7 +9,6 @@
     <script defer th:src="@{/js/user/register.js}"></script>
     <script defer th:src="@{/js/user/sms_code_timer.js}"></script>
     <script defer th:src="@{/js/user/sms_click_event.js}"></script>
-<!--    <script defer th:src="@{/js/user/id_duplication_test.js}"></script>-->
 </head>
 <body data-theme="light">
 <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous">
@@ -17,6 +16,7 @@
 <script>
     {
         $(document).ready(function () {
+
             $("#userLoginId").on("focusout", function () {
                 const userLoginId = $("#userLoginId").val();
 
@@ -43,10 +43,43 @@
                         console.error("AJAX 요청 실패 : ", status, error);
                     }
                 })
-            });
+            })
         });
     }
     </script>
+<script>
+    {
+        $(document).ready(function () {
+            $("#userNickname").on("focusout", function () {
+                const userNickname = $("#userNickname").val();
+
+                if (userNickname === '' || userNickname.length === 0) {
+                    $("#result2").css("color", "red").text("공백은 닉네임으로 사용할 수 없습니다.");
+                    return false;
+                }
+
+                $.ajax({
+                    url: "http://localhost:10000/user/checkNickname" ,
+                    contentType: "application/json",
+                    data: JSON.stringify({"userNickname" : userNickname}),
+                    type: 'post',
+                    dataType: "json",
+                    success : function (result2) {
+                        if (result2 == true) {
+                            $('#result2').css("color", "green").text("사용 가능한 닉네임 입니다.");
+                        } else {
+                            $('#result2').css("color", "red").text("중복된 닉네임 입니다.");
+                            $('#userNickname').val('');
+                        }
+                    },
+                    error: function (xhr, status, error){
+                        console.error("AJAX 요청 실패 : ", status, error);
+                    }
+                })
+            });
+        });
+    }
+</script>
 <div data-a-1120 id="wrap" class="web-mount">
     <section data-a-1120 class="content">
         <div data-g-1180 data-a-1120 class="login-container">
@@ -72,10 +105,11 @@
                                                     <span id="input-245-label" class="label">
                                                         닉네임
                                                     </span>
-                                        <input name="userNickname" autocomplete="off" id="input-245"
+                                        <input name="userNickname" autocomplete="off" id="userNickname"
                                                aria-labelledby="input-245-label" type="text" placeholder="필명 입력"
-                                               class="mds-input-field">
-                                        <button type="button">닉네임 중복체크</button><br>
+                                               class="mds-input-field" autofocus>
+<!--                                        <button type="button">닉네임 중복체크</button><br>-->
+                                        <div id="result2"></div>
                                     </div>
                                     <button type="button" aria-label="내용 삭제" class="mds-icon--input-delete clear-button"
                                             style></button>
@@ -245,7 +279,7 @@
                         </label>
                     </div>
                     <div class="button-area mt16">
-                        <button type="submit" class="next-button mds-button mds-button--primary mds-button--h56 mds-button--r4">
+                        <button type="submit" id="registerButton">
                             가입
                         </button>
                     </div>
