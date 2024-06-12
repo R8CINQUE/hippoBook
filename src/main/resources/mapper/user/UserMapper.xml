@@ -20,9 +20,9 @@
         VALUES (SEQ_USER_PROFILE.nextval, #{userProfileUploadPath}, #{userProfileUuid}, #{userProfileName}, #{userId})
     </insert>
 
-    <select id="checkUserId" resultType="boolean">
-        SELECT COUNT(*)
-        FROM HR.TBL_USER
-        WHERE USER_LOGIN_ID = #{userLoginId}
-    </select>
+<!--    <select id="checkUserId" resultType="boolean">-->
+<!--        SELECT COUNT(*)-->
+<!--        FROM HR.TBL_USER-->
+<!--        WHERE USER_LOGIN_ID = #{userLoginId}-->
+<!--    </select>-->
 </mapper>

@@ -9,5 +9,5 @@ import java.util.Optional;
 @Mapper
 public interface UserIdDuplicateMapper {
 
-    boolean selectId(@RequestParam("userLoginId") String userLoginId);
+    int selectId(String userLoginId);
 }
