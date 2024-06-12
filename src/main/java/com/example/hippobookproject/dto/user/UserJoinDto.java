@@ -11,7 +11,7 @@ public class UserJoinDto {
     private String userPassword;
     private String userPhonenumber;
     private String userGender;
-    private int userAge;
+    private Integer userAge;
 
     private String yymmdd;
     private String genderNum;
