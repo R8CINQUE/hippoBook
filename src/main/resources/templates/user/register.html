@@ -26,16 +26,21 @@
                 }
 
                 $.ajax({
-                    url: './register?userLoginId=' + userLoginId,
-                    data: {userLoginId: userLoginId},
-                    type: 'GET',
-                    success: function (result) {
-                        if (result === true) {
-                            $('#result').css("color", "black").text("사용 가능한 ID 입니다.");
+                    url: "http://localhost:10000/user/checkDuplicate" ,
+                    contentType: "application/json",
+                    data: JSON.stringify({"userLoginId" : userLoginId}),
+                    type: 'post',
+                    dataType: "json",
+                    success : function (result) {
+                        if (result == true) {
+                            $('#result').css("color", "green").text("사용 가능한 ID 입니다.");
                         } else {
                             $('#result').css("color", "red").text("중복된 ID 입니다.");
                             $('#userLoginId').val('');
                         }
+                    },
+                    error: function (xhr, status, error){
+                        console.error("AJAX 요청 실패 : ", status, error);
                     }
                 })
             });
@@ -183,9 +188,9 @@
                                             <sup>*</sup>
                                         </span>
                                         <input type="text" name="userLoginId" id="userLoginId" placeholder="아이디를 입력해주세요" autofocus>
-                                    <span class="id_ok">사용 가능한 아이디입니다.</span>
-                                    <span class="id_already">중복된 아이디입니다.</span>
-<!--                                        <button type="button" onclick="checkLoginId()">ID 중복체크</button><br>-->
+<!--                                    <span class="id_ok">사용 가능한 아이디입니다.</span>-->
+<!--                                    <span class="id_already">중복된 아이디입니다.</span>-->
+<!--                                        <button type="button" onchange="checkLoginId()">ID 중복체크</button><br>-->
                                     <div id="result"></div>
                                 </div>
                                 <button type="button" aria-label="내용 삭제" class="mds-icon--input-delete clear-button"
