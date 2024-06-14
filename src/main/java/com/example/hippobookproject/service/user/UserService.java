@@ -100,5 +100,5 @@ public class UserService {
         return userProfileDto;
     }
 
-//    아이디 중복 검사
+//    비밀번호 중복 검사
 }

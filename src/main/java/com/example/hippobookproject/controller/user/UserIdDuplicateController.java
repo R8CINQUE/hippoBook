@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static org.springframework.web.servlet.function.ServerResponse.badRequest;
 
@@ -23,6 +24,8 @@ public class UserIdDuplicateController {
     @Autowired
     private UserIdDuplicateService userIdDuplicateService;
 
+    private static final Pattern ID_PATTERN = Pattern.compile("^[a-z0-9]{6,12}$");
+
     @PostMapping("/checkDuplicate")
     @ResponseBody
     public ResponseEntity<Boolean> confirmId(@RequestBody Map<String, String> requestBody){
@@ -30,13 +33,17 @@ public class UserIdDuplicateController {
         log.info("register..............");
         log.info("userLoginId:"+userLoginId);
 
-        if(userLoginId == null || userLoginId.trim().isEmpty()) {
-            log.info("userLoginId : " + userLoginId);
+        if(!isValidId(userLoginId)) {
+            log.info("Invalid userLoginId : " + userLoginId);
             return ResponseEntity.badRequest().build();
         }
 
        boolean result = !userIdDuplicateService.selectId(userLoginId);
 
        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    private boolean isValidId(String id) {
+        return ID_PATTERN.matcher(id).matches();
     }
 }

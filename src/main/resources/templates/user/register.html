@@ -20,8 +20,10 @@
             $("#userLoginId").on("focusout", function () {
                 const userLoginId = $("#userLoginId").val();
 
-                if (userLoginId === '' || userLoginId.length === 0) {
-                    $("#result").css("color", "red").text("공백은 ID로 사용할 수 없습니다.");
+                const pattern = /^[a-z0-9]{6,12}$/;
+
+                if (!pattern.test(userLoginId)) {
+                    $("#result").css("color", "red").text("6-12자 이내의 영문 소문자와 숫자만 사용 가능합니다.");
                     return false;
                 }
 
@@ -59,7 +61,7 @@
                 }
 
                 $.ajax({
-                    url: "http://localhost:10000/user/checkNickname" ,
+                    url: "http://localhost:10000/user/checkNickname",
                     contentType: "application/json",
                     data: JSON.stringify({"userNickname" : userNickname}),
                     type: 'post',
@@ -80,6 +82,38 @@
         });
     }
 </script>
+<!--<script>-->
+<!--    $(document).ready(function () {-->
+<!--        $("#userPassword").on("focusout", function () {-->
+<!--            const userPassword = $("#userPassword").val();-->
+<!--            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=`~{}|:;'<>,.?/]).{8,20}$/;-->
+
+<!--            if (!userPassword.match(passwordRegex)) {-->
+<!--                $("#result2").css("color", "red").text("비밀번호는 8~20자 이내의 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.");-->
+<!--                return false;-->
+<!--            }-->
+
+<!--            $.ajax({-->
+<!--                url: "http://localhost:10000/user/checkPassword",-->
+<!--                contentType: "application/json",-->
+<!--                data: JSON.stringify({"userPassword" : userPassword}),-->
+<!--                type: 'post',-->
+<!--                dataType: "json",-->
+<!--                success : function (result2) {-->
+<!--                    if (result2 === true) {-->
+<!--                        $('#result2').css("color", "green").text("사용 가능한 비밀번호 입니다.");-->
+<!--                    } else {-->
+<!--                        $('#result2').css("color", "red").text("사용할 수 없는 비밀번호 입니다.");-->
+<!--                        $('#userPassword').val('');-->
+<!--                    }-->
+<!--                },-->
+<!--                error: function (xhr, status, error){-->
+<!--                    console.error("AJAX 요청 실패 : ", status, error);-->
+<!--                }-->
+<!--            })-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
 <div data-a-1120 id="wrap" class="web-mount">
     <section data-a-1120 class="content">
         <div data-g-1180 data-a-1120 class="login-container">
