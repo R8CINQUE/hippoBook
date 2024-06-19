@@ -56,7 +56,7 @@
                 const userNickname = $("#userNickname").val();
 
                 if (userNickname === '' || userNickname.length === 0) {
-                    $("#result2").css("color", "red").text("공백은 닉네임으로 사용할 수 없습니다.");
+                    $("#resultN").css("color", "red").text("공백은 닉네임으로 사용할 수 없습니다.");
                     return false;
                 }
 
@@ -66,11 +66,11 @@
                     data: JSON.stringify({"userNickname" : userNickname}),
                     type: 'post',
                     dataType: "json",
-                    success : function (result2) {
-                        if (result2 == true) {
-                            $('#result2').css("color", "green").text("사용 가능한 닉네임 입니다.");
+                    success : function (resultN) {
+                        if (resultN == true) {
+                            $('#resultN').css("color", "green").text("사용 가능한 닉네임 입니다.");
                         } else {
-                            $('#result2').css("color", "red").text("중복된 닉네임 입니다.");
+                            $('#resultN').css("color", "red").text("중복된 닉네임 입니다.");
                             $('#userNickname').val('');
                         }
                     },
@@ -82,38 +82,78 @@
         });
     }
 </script>
-<!--<script>-->
-<!--    $(document).ready(function () {-->
-<!--        $("#userPassword").on("focusout", function () {-->
-<!--            const userPassword = $("#userPassword").val();-->
-<!--            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=`~{}|:;'<>,.?/]).{8,20}$/;-->
+<script>
+    $(document).ready(function () {
+        $("#userPassword").on("keyup", function () {
+            validatePassword();
+        });
 
-<!--            if (!userPassword.match(passwordRegex)) {-->
-<!--                $("#result2").css("color", "red").text("비밀번호는 8~20자 이내의 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.");-->
-<!--                return false;-->
-<!--            }-->
+        $("#confirmPassword").on("keyup", function () {
+            validatePassword();
+        });
 
-<!--            $.ajax({-->
-<!--                url: "http://localhost:10000/user/checkPassword",-->
-<!--                contentType: "application/json",-->
-<!--                data: JSON.stringify({"userPassword" : userPassword}),-->
-<!--                type: 'post',-->
-<!--                dataType: "json",-->
-<!--                success : function (result2) {-->
-<!--                    if (result2 === true) {-->
-<!--                        $('#result2').css("color", "green").text("사용 가능한 비밀번호 입니다.");-->
-<!--                    } else {-->
-<!--                        $('#result2').css("color", "red").text("사용할 수 없는 비밀번호 입니다.");-->
-<!--                        $('#userPassword').val('');-->
-<!--                    }-->
-<!--                },-->
-<!--                error: function (xhr, status, error){-->
-<!--                    console.error("AJAX 요청 실패 : ", status, error);-->
-<!--                }-->
-<!--            })-->
-<!--        });-->
-<!--    });-->
-<!--</script>-->
+        // 비밀번호 유효성 및 일치 검사
+        function validatePassword() {
+            const userPassword = $("#userPassword").val();
+            const confirmPassword = $("#confirmPassword").val();
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=`~{}|:;'<>,.?/]).{8,20}$/;
+            const passwordMessage = $("#passwordMessage");
+            const confirmPasswordMessage = $("#confirmPasswordMessage");
+
+            // 비밀번호 유효성 검사
+            if (!userPassword.match(passwordRegex)) {
+                passwordMessage.removeClass('success').addClass('error').text("비밀번호는 8~20자 이내의 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.");
+                $("#userPassword");
+                passwordMessage.css("color", "red");
+                return false;
+            } else {
+                passwordMessage.removeClass('error').addClass('success').text("비밀번호가 조건을 충족합니다.");
+                $("#userPassword");
+                passwordMessage.css("color", "green");
+            }
+
+            // 비밀번호 일치 검사
+            if (userPassword !== confirmPassword) {
+                confirmPasswordMessage.removeClass('success').addClass('error').text("비밀번호가 일치하지 않습니다.");
+                $("#confirmPassword");
+                confirmPasswordMessage.css("color", "red");
+            } else {
+                confirmPasswordMessage.removeClass('error').addClass('success').text("비밀번호가 일치합니다.");
+                $("#confirmPassword");
+                confirmPasswordMessage.css("color", "green");
+
+                // 일치할 경우 서버에 비밀번호 전송
+                sendPasswordToServer(userPassword);
+            }
+        }
+
+        // 서버에 비밀번호 전송
+        function sendPasswordToServer(password) {
+            $.ajax({
+                url: "http://localhost:10000/user/checkPassword",
+                contentType: "application/json",
+                data: JSON.stringify({ "userPassword": password }),
+                type: 'post',
+                dataType: "json",
+                success: function (response) {
+                    console.log("AJAX 요청 성공: ", response);
+                    if (response === true) {
+                        $("#confirmPasswordMessage").removeClass('error').addClass('success').text("서버에서도 비밀번호가 일치합니다.");
+                        $("#confirmPassword").css("border-color", "green");
+                    } else {
+                        $("#confirmPasswordMessage").removeClass('success').addClass('error').text("서버에서 비밀번호 일치 여부를 확인할 수 없습니다.");
+                        $("#confirmPassword").css("border-color", "red");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX 요청 실패 : ", status, error);
+                    $("#confirmPasswordMessage").removeClass('success').addClass('error').text("서버 요청에 실패했습니다. 다시 시도해주세요.");
+                    $("#confirmPassword").css("border-color", "red");
+                }
+            });
+        }
+    });
+</script>
 <div data-a-1120 id="wrap" class="web-mount">
     <section data-a-1120 class="content">
         <div data-g-1180 data-a-1120 class="login-container">
@@ -143,7 +183,7 @@
                                                aria-labelledby="input-245-label" type="text" placeholder="필명 입력"
                                                class="mds-input-field" autofocus>
 <!--                                        <button type="button">닉네임 중복체크</button><br>-->
-                                        <div id="result2"></div>
+                                        <div id="resultN"></div>
                                     </div>
                                     <button type="button" aria-label="내용 삭제" class="mds-icon--input-delete clear-button"
                                             style></button>
@@ -206,14 +246,14 @@
                                                                 <span id="input-157-label" class="label">
                                                                     휴대폰 번호 입력
                                                                 </span>
-                                    <input id="input-157"
+                                    <input
                                            placeholder="01012345678"
                                            class="mds-input-field" name="userPhonenumber">
                                 </div>
-                                <button type="button" class="phone-info-code-button" onclick="takeTarget()" id="sendSMSButton" name="phoneNumber">
-                                    <span>인증번호 발송</span>
-                                </button>
-                            </div>
+                                    <button type="button" class="phone-info-code-button" onclick="takeTarget()" id="sendSMSButton" name="phoneNumber">
+                                        <span>인증번호 발송</span>
+                                    </button>
+                                </div>
                         </label>
                     </div>
                     <div class="input-item">
@@ -230,13 +270,13 @@
                                                placeholder="인증번호 6자리 입력"
                                                class="mds-input-field">
                                     </div>
-                                    <button type="button" id="phone-code-check-button">
-                                    <span>인증번호 확인</span>
-                                    </button>
                                     <span class="sms_code_timer">
                                         <span id="remaining__min">3</span> :
                                         <span id="remaining__sec">00</span>
                                     </span>
+                                    <button type="button" class="phone-info-code-button" id="phone-code-check-button">
+                                    <span>인증번호 확인</span>
+                                    </button>
                                 </div>
                             </label>
                         </div>
@@ -274,41 +314,36 @@
                         <label>
                             <div class="inner">
                                 <div class="input">
-                                        <span id="input-238-label" class="label">
-                                            비밀번호
-                                            <sup>*</sup>
-                                        </span>
-                                    <input autocomplete="off" id="input-238" aria-labelledby="input-238-label"
-                                           aria-errormessage="input-238-message" type="password"
-                                           placeholder="비밀번호 입력" class="mds-input-field"
-                                           name="userPassword"
-                                    >
+                <span id="input-238-label" class="label">
+                    비밀번호
+                    <sup>*</sup>
+                </span>
+                                    <input type="password" placeholder="비밀번호를 입력해주세요" id="userPassword" name="userPassword" autofocus>
+                                    <div id="passwordMessage" ></div>
+                                    <button type="button" class="secret-button">
+                                        <i class="icon-eye_off"></i>
+                                    </button>
                                 </div>
-                                <button type="button" class="secret-button">
-                                    <i class="icon-eye_off"></i>
-                                </button>
                             </div>
                         </label>
                         <div class="message-wrap">
-                            <p aria-live="assertive" id="input-238-message" role="alert" class="message">8~20자 이내 영문
-                                대/소문자,숫자,특수문자만 사용 가능합니다.</p>
+                            <p aria-live="assertive" role="alert" class="message">
+                                8~20자 이내 영문 대/소문자, 숫자, 특수문자만 사용 가능합니다.
+                            </p>
                         </div>
                     </div>
+
                     <div data-g-1180 class="mds-input input mds-input--default mds-input--required mds-input--left">
                         <label>
                             <div class="inner">
                                 <div class="input">
-                                    <span id="input-239-label" class="label">
-                                        비밀번호 재입력
-                                        <sup>*</sup>
-                                    </span>
-                                    <input autocomplete="off" id="input-239" aria-labelledby="input-239-label"
-                                           aria-errormessage="input-239-message" type="password"
-                                           placeholder="비밀번호 재입력" class="mds-input-field">
+                <span id="input-239-label" class="label">
+                    비밀번호 재입력
+                    <sup>*</sup>
+                </span>
+                                    <input type="password" placeholder="비밀번호를 재입력해주세요" id="confirmPassword" name="confirmPassword">
+                                    <div id="confirmPasswordMessage" class="message"></div>
                                 </div>
-                                <button type="button" class="secret-button">
-                                    <i class="icon-eye_off"></i>
-                                </button>
                             </div>
                         </label>
                     </div>
